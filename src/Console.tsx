@@ -6,6 +6,7 @@ import noUiSlider from 'nouislider';
 
 import useDelayEffect from './hooks/useDelayEffect';
 import useMarkDown from './hooks/useMarkDown';
+import { indentText } from './libs/String';
 const { electronAPI } = window;
 
 /**
@@ -123,10 +124,11 @@ export const Console: React.FC = () => {
         newPlaceHolders.set(placeName, '');
       }
     };
-    origin.replace(/{{ ?([a-zA-Z_-]+) ?}}/g, (all: string, placeName: string) => {
+    origin.replace(/{{ ?([a-zA-Z_-]+) ?}}/g, (substring: string, placeName: string): string => {
       appendPlaceHolder(placeName);
+      return '';
     });
-    origin.replace(/@(?:if|for) ?\((?:\S+ in )([a-zA-Z_-]+)\)/g, () => {});
+    //origin.replace(/@(?:if|for) ?\((?:\S+ in )([a-zA-Z_-]+)\)/g, (substring): string => '');
 
     return newPlaceHolders;
   };
@@ -143,6 +145,33 @@ export const Console: React.FC = () => {
       updateMarkDown({ origin: newOrigin, placeHolders: findPlaceHolders(newOrigin, placeHolders) })
     } else {
       updateMarkDown({ origin: newOrigin })
+    }
+  };
+
+  /**
+   * テキストエリアでキーを押下したときの処理
+   * @param event
+   */
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const input = event.target as HTMLTextAreaElement
+
+    if (event.key === 'Tab') {
+      event.preventDefault()
+      const { value: newOrigin, selectionStart, selectionEnd } = indentText({
+        value: origin,
+        selectionStart: input.selectionStart,
+        selectionEnd: input.selectionEnd
+      }, !event.shiftKey)
+
+      if (isTemplateEnable) {
+        updateMarkDown({ origin: newOrigin, placeHolders: findPlaceHolders(newOrigin, placeHolders) })
+      } else {
+        updateMarkDown({ origin: newOrigin })
+      }
+      setTimeout(() => {
+        input.selectionStart = selectionStart;
+        input.selectionEnd = selectionEnd
+      })
     }
   };
 
@@ -218,6 +247,7 @@ export const Console: React.FC = () => {
           value={origin}
           autoCapitalize="off"
           onChange={handleTextChange}
+          onKeyDown={handleKeyDown}
         />
         <div className="Console-radio-inline">
           {tabNames.map((tabName) => (
