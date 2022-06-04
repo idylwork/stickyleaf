@@ -1,0 +1,87 @@
+@import "./settings.scss";
+
+.Preview {
+  width: 60vw;
+  line-height: 1.1rem;
+  word-wrap: break-word;
+  padding: 45px 0 30px 15px;
+  box-sizing: border-box;
+
+  @include media-s() {
+    width: 100vw;
+    padding: 30px 10px $height-dew 5px;
+  }
+
+  @for $i from 1 through 6 {
+    .preview-md-heading-#{$i} {
+      font-size: #{1 / $i + 0.8}rem;
+      font-weight: 900;
+      padding: 0 #{(6 - $i) * 3}px;
+      margin: #{1.2 / $i}rem 0 #{0.2 / $i}rem;
+      @if $i <= 2 {
+        padding-bottom: 4px;
+        border-bottom: 1px solid $color-dark;
+      }
+    }
+  }
+  .preview-md-code {
+    color: rgb(205, 24, 24);
+    font-size: 0.8rem;
+    padding: 2px 4px;
+    border: 0.5px solid $color-dark;
+    border-radius: 2px;
+    margin: 0 2px;
+    background: rgba($color-light, 0.7);
+  }
+  pre.preview-md-code {
+    font-size: 0.8rem;
+    line-height: 1.1rem;
+    padding: 6px 4px;
+    margin: 5px 2px;
+  }
+
+  .preview-md-hr {
+    border-color: rgba(10, 12, 0, 0.2);
+  }
+
+  .preview-md-quote {
+    border-left: 2px solid #cccccc;
+    padding: 5px 14px;
+  }
+
+  .preview-md-list {
+    margin: 5px 0;
+    > .preview-md-list-item {
+      display: list-item;
+      list-style: square;
+      margin-left: 20px;
+      + .preview-md-list-item {
+        margin-top: 0.2rem;
+      }
+      @for $i from 1 through 4 {
+        &.preview-md-list-indent-#{$i} {
+          margin-left: #{$i * 20 + 20}px;
+        }
+      }
+    }
+  }
+
+  .preview-md-list > .preview-md-checklist {
+    list-style: none;
+    margin-left: 4px;
+
+    .preview-md-checkbox {
+      position: static;
+      opacity: 1;
+      pointer-events: all;
+      margin-right: 6px;
+    }
+  }
+
+  @for $i from 1 through 6 {
+    .preview-md-heading-#{$i} {
+      font-size: #{1 / $i + 0.8}rem;
+      font-weight: 900;
+    }
+  }
+}

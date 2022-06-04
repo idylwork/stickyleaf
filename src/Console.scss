@@ -1,0 +1,132 @@
+@charset 'UTF-8';
+
+@import "./settings.scss";
+
+.Console {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 40vw;
+  padding: 10px;
+  box-sizing: border-box;
+
+  @include media-s() {
+    width: 100vw;
+    height: $height-dew;
+    top: unset;
+    bottom: 0;
+    padding: 7px;
+  }
+
+  .Console-surface {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 20px 12px 10px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 2px;
+
+    @include media-s() {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 12px 6px;
+    }
+
+    // MaterializeCSSのボタン上書き
+    .btn {
+      flex-shrink: 0;
+      margin: 4px 0;
+      + button,
+      div {
+        margin-top: 0;
+      }
+    }
+    .btn-small {
+      font-size: 0.6rem;
+    }
+    .btn-extra-small {
+      font-size: 0.4rem;
+      font-weight: 500;
+      height: 22px;
+      line-height: 22px;
+    }
+    .Console-placeholder {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+      .Console-placeholder-label {
+        color: #333333;
+        font-weight: 100;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      input {
+        width: 80%;
+        min-width: 100px;
+        margin-left: 10px;
+        border: 0.99px solid #333333;
+        background: transparent;
+      }
+    }
+  }
+
+  // 見出しレベルのバー
+  .Console-input-heading-rate {
+    margin: 6px 0 38px;
+  }
+
+  // タブ
+  .Console-radio-inline {
+    display: inline-block;
+    margin-right: 20px;
+    &:last-of-type {
+      margin-right: 0;
+    }
+  }
+
+  // 文章編集部
+  .Console-textarea {
+    height: 100%;
+    resize: none;
+  }
+
+  .Console-tab {
+    .Console-tab-label {
+      font-size: 0.8rem;
+      line-height: 1.35rem;
+      padding-left: 25px;
+    }
+    + .Console-tab {
+      margin-left: 10px;
+    }
+  }
+}
+
+/* noUiSliderのオーバーライド */
+html {
+  .noUi-marker-horizontal.noUi-marker-large {
+    height: 7px;
+  }
+  .noUi-marker-horizontal.noUi-marker {
+    margin-left: 0;
+    width: 1px;
+    height: 5px;
+  }
+  .noUi-marker-horizontal.noUi-marker-sub {
+    height: 4px;
+  }
+  .noUi-horizontal .noUi-handle {
+    width: 14px;
+  }
+  &:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
+    right: -7px;
+    left: auto;
+  }
+  .noUi-handle:after,
+  .noUi-handle:before {
+    display: none;
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "persimmon",
+  "productName": "Persimmon",
+  "description": "Markdown editor for works.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "run-p dev:*",
+    "build": "cp -rf src/images/ dist/images && electron-packager . --overwrite --icon=./dist/images/icon.icns",
+    "deploy": "cp -rf Persimmon-darwin-x64/Persimmon.app /Applications",
+    "predev": "rimraf dist",
+    "dev:tsc": "tsc -w -p tsconfig.main.json",
+    "dev:webpack": "cross-env NODE_ENV=\"development\" webpack --progress",
+    "dev:electron": "wait-on ./dist/index.html && cross-env NODE_ENV=\"development\" electron ."
+  },
+  "build": {
+    "appId": "work.idyl.persimmon",
+    "files": [
+      "dist/*",
+      "src/*"
+    ],
+    "mac": {
+      "icon": "dist/images/icon.icns",
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "materialize-css": "^1.0.0",
+    "nouislider": "^15.5.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.6.0",
+    "electron": "^17.1.0",
+    "electron-packager": "^15.4.0",
+    "electron-reload": "^2.0.0-alpha.1",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.5.3",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "sass": "^1.49.9",
+    "sass-loader": "^12.6.0",
+    "ts-loader": "^9.2.6",
+    "ts-node": "^10.5.0",
+    "typescript": "^4.5.5",
+    "wait-on": "^6.0.1",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-fix-style-only-entries": "^0.6.1"
+  }
+}
