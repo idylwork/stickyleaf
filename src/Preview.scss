@@ -32,6 +32,7 @@
     border-radius: 2px;
     margin: 0 2px;
     background: rgba($color-light, 0.7);
+    white-space: pre-wrap;
   }
   pre.preview-md-code {
     font-size: 0.8rem;
@@ -82,6 +83,22 @@
     .preview-md-heading-#{$i} {
       font-size: #{1 / $i + 0.8}rem;
       font-weight: 900;
+    }
+  }
+
+  // Mermaid記法
+  .mermaid {
+    background: rgba(240, 240, 240, 0.8);
+    border: 0.99px solid #797d7d;
+    border-radius: 5px;
+    overflow: scroll;
+    text-align: center;
+    padding-top: 0.5rem;
+    box-shadow: inset 1px 3px 5px rgba(10, 10, 10, 0.2);
+    margin: 1rem 0 0;
+    svg {
+      width: unset;
+      zoom: 0.8;
     }
   }
 }

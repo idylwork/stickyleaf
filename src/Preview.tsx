@@ -1,12 +1,24 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import useMarkDown from './hooks/useMarkDown';
 import './Preview.scss';
 import { convert } from './rules';
+import mermaid from 'mermaid';
+
+mermaid.initialize({ startOnLoad: false })
 
 export const Preview: React.FC = () => {
   const { origin, placeHolders, updateMarkDown } = useMarkDown();
 
   const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      const mermaidEl = contentRef.current.querySelector('.mermaid')
+      if (mermaidEl) {
+        mermaid.init(mermaidEl)
+      }
+    }
+  })
 
   // プレビューのクリックイベント
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -38,7 +50,7 @@ export const Preview: React.FC = () => {
 
   /** 文章を変換 */
   const html = useMemo(() => {
-    return convert(origin, 'markdown', { placeHolders }).replace(/\n/g, '<br>');
+    return convert(origin, 'markdown', { placeHolders })
   }, [origin, placeHolders]);
 
   return (

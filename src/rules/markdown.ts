@@ -3,8 +3,13 @@ import { arrayToTable, escapeHtml, splitPresence } from '../modules';
 // マークダウンプレビュー
 export default new Map<RegExp, string | Function>([
   /* コード */
-  [/^```[a-z]*?\n*([^`]*\n)```$/gm, (args: string[]) => {
-    return `<div class="preview-md-code">${escapeHtml(args[1])}</div>`;
+  [/^```([a-z]*)\n*([^`]*\n)```$/gm, (args: string[]) => {
+    // マーメイド記法
+    if (args[1] === 'mermaid') {
+      console.log('🧜‍♀️MERMAID', args[2])
+      return `<div class="mermaid">${args[2].replace(/\n/g, '\\n')}</div>`;
+    }
+    return `<div class="preview-md-code">${escapeHtml(args[2])}</div>`;
   }],
   /* インラインコード */
   [/`([^`]+)`/g, '<span class="preview-md-code">$1</span>'],
@@ -105,4 +110,8 @@ export default new Map<RegExp, string | Function>([
     let level = args[1].length;
     return '<h' + level + ' class="preview-md-heading-' + level + '">' + args[2] + '</h' + level + '>';
   }],
+  /* 改行をHTML化  */
+  [/\n/g, '<br>'],
+  /* 改行エスケープを改行文字に戻す */
+  [/\\n/g, '\n'],
 ]);
