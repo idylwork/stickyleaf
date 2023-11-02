@@ -1,0 +1,41 @@
+@charset 'UTF-8';
+
+@import "./settings.scss";
+
+.ActionMenu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  &-button {
+    width: 100%;
+  }
+
+  &-list {
+    position: absolute;
+    top: 1.75rem;
+    left: 0;
+
+    background: white;
+    border-radius: 4px;
+    width: 100%;
+    overflow: hidden;
+    opacity: 0.9;
+  }
+
+  &-item {
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+
+    &:hover {
+      background: #e2e0e6;
+    }
+    &.ActionMenu-disabled {
+      color: #ccc;
+      cursor: default;
+      &:hover {
+        background: none;
+      }
+    }
+  }
+}

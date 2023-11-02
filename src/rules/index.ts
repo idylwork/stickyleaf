@@ -1,4 +1,3 @@
-import { stringify } from 'querystring';
 import backlog from './backlog';
 import backlog_reverse from './backlog_reverse';
 import duplicated from './duplicated';
@@ -101,6 +100,5 @@ export const convert = (origin: string, ruleName: string, options: Options = {})
   });
   return output;
 };
-
 
 export default ruleMaps;

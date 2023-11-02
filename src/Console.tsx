@@ -7,6 +7,7 @@ import noUiSlider from 'nouislider';
 import useDelayEffect from './hooks/useDelayEffect';
 import useMarkDown from './hooks/useMarkDown';
 import { indentText } from './libs/String';
+import { ActionMenu } from './ActionMenu';
 const { electronAPI } = window;
 
 /**
@@ -50,6 +51,8 @@ export const Console: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>(tabNames[0]);
   /* テンプレート構文やプレースホルダを利用するか */
   const [isTemplateEnable, setIsTemplateEnable] = useState<boolean>(false);
+  /* 操作メニューを表示するか */
+  const [isMenuPresented, setIsMenuPresented] = useState(false);
 
   /* ステートを初期化済みか */
   const isInitializedRef = useRef<boolean>(false);
@@ -91,14 +94,6 @@ export const Console: React.FC = () => {
       saveOrigins();
     }
   }, [origin]);
-
-  // ルール選択時
-  const handleRuleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedRule(event.currentTarget.value);
-
-    // アプリケーションタイトルの更新
-    electronAPI.update(selectedRule);
-  };
 
   /**
    * 本文中からプレースホルダ構文を検出してMapオブジェクトを登録する
@@ -184,11 +179,14 @@ export const Console: React.FC = () => {
     const newSelectedTab = event.currentTarget.value;
     setSelectedTab(newSelectedTab);
     updateMarkDown({ origin: originsRef.current.get(newSelectedTab) ?? '' })
+
+    // アプリケーションタイトルの更新
+    electronAPI.update(newSelectedTab);
   };
 
   /** テンプレート構文を有効にする */
-  const handleEnableTemplate = () => {
-    setIsTemplateEnable(true);
+  const toggleIsTemplateEnabled = () => {
+    setIsTemplateEnable(!isTemplateEnable);
     updateMarkDown({ placeHolders: findPlaceHolders(origin) });
   };
 
@@ -204,9 +202,26 @@ export const Console: React.FC = () => {
   };
 
   /**
+   * 重複行の検索
+   */
+  const findDuplicatedLine = () => {
+    let rows = origin.split('\n');
+
+    let duplicated = rows.filter(function (row, i, self) {
+      return  row !== '' && self.indexOf(row) === i && i !== self.lastIndexOf(row);
+    });
+
+    if (duplicated.length) {
+      electronAPI.notify(`重複する行がありました\n${duplicated.join('\n')}`);
+    } else {
+      electronAPI.notify('重複する行はありません');
+    }
+  };
+
+  /**
    * テキストを変換してコピー
    */
-  const copy = () => {
+  const copyBacklogFormat = () => {
     const options = { headingRate, placeHolders };
     const text = convert(origin, selectedRule, options).replace(/<br>/g, '\n');
     if (text) {
@@ -218,30 +233,27 @@ export const Console: React.FC = () => {
   return (
     <section className="Console window-undraggable">
       <div className="Console-surface">
-        <select className="browser-default" value={selectedRule} onChange={handleRuleChange}>
-          {Object.keys(ruleMaps).map((ruleName) => <option key={ruleName}>{ruleName}</option>)}
-        </select>
-        {['backlog', 'backlogReverse'].includes(selectedRule) && (
-          <div className="Console-input-heading-rate"></div>
-        )}
-        <button className="btn btn-small transparent black-text" onClick={copy}>Copy</button>
-        {isTemplateEnable
-          ? [...placeHolders].map(([placeName, value]) => (
-            <label className="Console-placeholder" key={placeName}>
-              <div className="Console-placeholder-label">{placeName}</div>
-              <input
-                type="text"
-                className="browser-default"
-                value={value}
-                data-place-name={placeName}
-                onChange={handlePlaceholderChange}
-              />
-            </label>
-          ))
-          : <button type="button" className="btn btn-extra-small btn-block transparent black-text" onClick={handleEnableTemplate}>
-               Template Syntax
-            </button>
-        }
+        <ActionMenu actions={{
+          '重複行検索': findDuplicatedLine,
+          'Backlog書式でコピー': copyBacklogFormat,
+          'Backlog書式から変換': null,
+          [isTemplateEnable ? 'テンプレート構文を使用しない' : 'テンプレート構文を使用する']: toggleIsTemplateEnabled,
+          '見出しをスティッキーにする': null,
+          'ファイルに保存': null,
+          'ファイルから復元する': null,
+        }} />
+        {isTemplateEnable && [...placeHolders].map(([placeName, value]) => (
+          <label className="Console-placeholder" key={placeName}>
+            <div className="Console-placeholder-label">{placeName}</div>
+            <input
+              type="text"
+              className="browser-default"
+              value={value}
+              data-place-name={placeName}
+              onChange={handlePlaceholderChange}
+            />
+          </label>
+        ))}
         <textarea
           className="Console-textarea"
           value={origin}
