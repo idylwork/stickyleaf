@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ActionMenu.scss';
+import { CSSTransition } from 'react-transition-group';
 
 type Props = {
   actions: { [key: string]: (() => void) | null }
@@ -19,7 +20,8 @@ export const ActionMenu: React.FC<Props> = ({ actions }) => {
   /**
    * 操作メニューを開閉する
    */
-  const handleButtonClick = () => {
+  const handleButtonClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
     setIsMenuPresented(!isMenuPresented);
   };
 
@@ -45,12 +47,15 @@ export const ActionMenu: React.FC<Props> = ({ actions }) => {
   return (
     <div className="ActionMenu">
       <button type="button" className="btn btn-small transparent black-text" onClick={handleButtonClick}>Menu</button>
-      {isMenuPresented && <ul className="ActionMenu-list card" ref={menuRef}>
-        {Object.entries(actions).map(([label, action]) => (action
-          ? <li className="ActionMenu-item" key={label} onClick={() => { action(); setIsMenuPresented(false); }}>{label}</li>
-          : <li className="ActionMenu-item ActionMenu-disabled" key={label}>{label}</li>
-        ))}
-      </ul>}
+
+      <CSSTransition in={isMenuPresented} timeout={100} nodeRef={menuRef} unmountOnExit classNames="ActionMenu-list">
+        <ul className="ActionMenu-list card" ref={menuRef}>
+          {Object.entries(actions).map(([label, action]) => (action
+            ? <li className="ActionMenu-item" key={label} onClick={() => { action(); setIsMenuPresented(false); }}>{label}</li>
+            : <li className="ActionMenu-item ActionMenu-disabled" key={label}>{label}</li>
+          ))}
+        </ul>
+      </CSSTransition>
     </div>
   );
 };

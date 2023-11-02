@@ -94,3 +94,36 @@ const splitSelectionLines = ({ value, selectionStart, selectionEnd }: SelectionT
   const suffix = value.slice(selectionEnd);
   return [prefix, selection, suffix]
 }
+
+/**
+ * 文章中からプレースホルダ構文を検出してMapオブジェクトを更新する
+ * @param placeHolders プレースホルダマップ (定義がなければNULL)
+ * @param value 文章
+ * @returns プレースホルダマップ
+ */
+export const updatedPlaceholders = (placeHolders: Map<string, string> | null = null, newValue: string) => {
+  const newPlaceHolders = new Map(placeHolders ?? []);
+  // 文章中のプレースホルダーも入力値もなくなった場合は項目削除
+  newPlaceHolders.forEach((value, placeName) => {
+    if (value === '') {
+      newPlaceHolders.delete(placeName);
+    }
+  });
+
+  /**
+   * プレースホルダ名を取得してnewPlaceHoldersを更新
+   * @param all 全文 (未使用)
+   * @param placeName プレースホルダのキー名
+   */
+  const appendPlaceHolder = (placeName: string) => {
+    if (!newPlaceHolders.has(placeName)) {
+      newPlaceHolders.set(placeName, '');
+    }
+  };
+  newValue.replace(/{{ ?([a-zA-Z_-]+) ?}}/g, (substring: string, placeName: string): string => {
+    appendPlaceHolder(placeName);
+    return '';
+  });
+
+  return newPlaceHolders;
+};

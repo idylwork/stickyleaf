@@ -22,6 +22,7 @@
   .Console-surface {
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
     width: 100%;
     height: 100%;
     padding: 20px 12px 10px;
@@ -40,6 +41,9 @@
       margin: 4px 0;
       + button,
       div {
+        margin-top: 0;
+      }
+      &:first-child {
         margin-top: 0;
       }
     }
@@ -90,7 +94,9 @@
   // 文章編集部
   .Console-textarea {
     height: 100%;
+    border: none;
     resize: none;
+    box-shadow: inset 0 1px 1px 0 rgb(0 0 0 / 7%), inset 0 1.5px 0.5px -1px rgb(0 0 0 / 6%), inset 0 0.5px 2.5px 0 rgb(0 0 0 / 10%);
   }
 
   .Console-tab {
@@ -102,31 +108,5 @@
     + .Console-tab {
       margin-left: 10px;
     }
-  }
-}
-
-/* noUiSliderのオーバーライド */
-html {
-  .noUi-marker-horizontal.noUi-marker-large {
-    height: 7px;
-  }
-  .noUi-marker-horizontal.noUi-marker {
-    margin-left: 0;
-    width: 1px;
-    height: 5px;
-  }
-  .noUi-marker-horizontal.noUi-marker-sub {
-    height: 4px;
-  }
-  .noUi-horizontal .noUi-handle {
-    width: 14px;
-  }
-  &:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
-    right: -7px;
-    left: auto;
-  }
-  .noUi-handle:after,
-  .noUi-handle:before {
-    display: none;
   }
 }
