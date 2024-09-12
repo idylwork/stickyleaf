@@ -8,7 +8,7 @@
   right: 0;
   height: 100vh;
   width: 40vw;
-  padding: 10px;
+  padding: 0.5rem;
   box-sizing: border-box;
 
   @include media-s() {
@@ -16,7 +16,7 @@
     height: $height-dew;
     top: unset;
     bottom: 0;
-    padding: 7px;
+    padding: 0.3rem;
   }
 
   .Console-surface {
@@ -24,14 +24,14 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    padding: 10px 12px 10px;
+    padding: 0.5rem 0.2rem 0.5rem;
     box-sizing: border-box;
     background: rgba(255, 255, 255, 0.4);
     border-radius: 4px;
 
     @include media-s() {
       background: rgba(255, 255, 255, 0.8);
-      padding: 10px 12px 6px;
+      padding: 0.5rem 0.3rem 0.3rem;
     }
 
     .Console-placeholder {
@@ -53,32 +53,12 @@
         background: transparent;
       }
     }
+  }
 
-    // MaterializeCSSのボタン上書き
-    .btn {
-      flex-shrink: 0;
-      margin: 4px 0;
-
-      +button,
-      div {
-        margin-top: 0;
-      }
-
-      &:first-child {
-        margin-top: 0;
-      }
-    }
-
-    .btn-small {
-      font-size: 0.6rem;
-    }
-
-    .btn-extra-small {
-      font-size: 0.4rem;
-      font-weight: 500;
-      height: 22px;
-      line-height: 22px;
-    }
+  .Console-menu {
+    display: flex;
+    justify-content: right;
+    gap: 0.1rem;
   }
 
   // 見出しレベルのバー
@@ -89,8 +69,12 @@
   // 文章編集部
   .Console-textarea {
     height: 100%;
+    background: transparent;
     border: none;
     resize: none;
+    font-size: 0.7rem;
+    font-weight: 100;
+    font-family: ui-monospace, monospace;
     box-shadow: inset 0 1px 1px 0 rgb(0 0 0 / 7%), inset 0 1.5px 0.5px -1px rgb(0 0 0 / 6%), inset 0 0.5px 2.5px 0 rgb(0 0 0 / 10%);
   }
 }

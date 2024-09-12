@@ -9,29 +9,37 @@ interface Options {
   placeHolders?: Map<string, string>;
 }
 
+/** 変換ルール名 */
+export const RuleType = {
+  Html: 'markdown',
+  Backlog: 'backlog',
+  BacklogReverse: 'backlog_reverse',
+  Sql: 'sql',
+  Duplicated: 'duplicated',
+  None: '',
+} as const;
+export type RuleType = typeof RuleType[keyof typeof RuleType]
+
 const ruleMaps: { [index: string]: Map<RegExp, string | Function>; } = {
-  backlog,
-  backlog_reverse,
-  sql,
-  duplicated,
-  markdown,
+  [RuleType.Backlog]: backlog,
+  [RuleType.BacklogReverse]: backlog_reverse,
+  [RuleType.Sql]: sql,
+  [RuleType.Duplicated]: duplicated,
+  [RuleType.Html]: markdown,
 };
 
 /**
  * 変換ルールとテンプレート構文を有効にする
  * @param origin
- * @param ruleName
+ * @param ruleType
  * @param options
  * @returns
  */
-export const convert = (origin: string, ruleName: string, options: Options = {}) => {
+export const convert = (origin: string, ruleType: RuleType, options: Options = {}) => {
   // 変換ルールリストを取得
-  const ruleMap = ruleMaps[ruleName];
-  if (!ruleMap) {
-    return origin;
-  }
+  const ruleMap = ruleMaps[ruleType] ?? new Map();
 
-  // 整形
+  // 末尾整形
   let output = origin.replace(/(.)\n?$/, '$1\n');
 
   // 見出しレベルのデフォルト
@@ -46,10 +54,15 @@ export const convert = (origin: string, ruleName: string, options: Options = {})
       let index = 0;
       const regExp = new RegExp(`{{ ?${placeName} ?}}`, 'g');
 
-      // @for (items) コンマ区切りの数だけ繰り返す
-      const forRegExp = new RegExp(`@for ?\\(${placeName}\\)\\n?([\\s\\S]+?\\n)?@endfor\\n?`, 'g');
-      output = output.replace(forRegExp, (_all: string, text: string) => {
-        return value !== '' ? text.repeat(chunks.length) : '';
+      // @for (items) コンマ区切りの数だけ繰り返す (内部のテンプレート展開を項目のみにする)
+      const forRegExp = new RegExp(`@for ?\\((${placeName})\\)\\n?([\\s\\S]+?\\n)?@endfor\\n?`, 'g');
+      output = output.replace(forRegExp, (_all: string, item: string, text: string) => {
+        console.log({item, text})
+        const items = value.split(/, ?/);
+        return items.map((chunk) => {
+          const itemRegExp = new RegExp(`{{ ?${item} ?}}`, 'g');
+          return text.replace(itemRegExp, chunk);
+        }).join('');
       });
 
       // @for (item in items) コンマ区切りの数だけ繰り返す

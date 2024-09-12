@@ -1,49 +1,57 @@
+
 @charset 'UTF-8';
 
-@import "./settings.scss";
+@import "../settings.scss";
 
-.ActionMenu {
+.MenuButton {
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-bottom: 0.25rem;
 
   &-button {
     width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px #00000030;
   }
 
-  &-list {
+  &-content {
     position: absolute;
+    right: 0;
     background: white;
     border-radius: 4px;
-    width: 100%;
+    min-width: 100%;
     overflow: hidden;
     opacity: 0.9;
+    box-shadow: 0 2px 3px #00000020;
 
     // 開閉アニメーション
     transition: top 0.1s, opacity 0.1s;
-    &.ActionMenu-list-enter {
-      top: 0;
+    &.MenuButton-content-enter {
+      top: 1rem;
       opacity: 0;
       pointer-events: none;
     }
-    &.ActionMenu-list-enter-active {
-      top: 1.5rem;
+    &.MenuButton-content-enter-active {
+      top: 1.2rem;
       opacity: 1;
     }
-    &.ActionMenu-list-enter-done {
-      top: 1.5rem;
+    &.MenuButton-content-enter-done {
+      top: 1.2rem;
       opacity: 1;
     }
-    &.ActionMenu-list-exit {
-      top: 1.5rem;
+    &.MenuButton-content-exit {
+      top: 1.2rem;
       opacity: 1;
     }
-    &.ActionMenu-list-exit-active {
-      top: 0;
+    &.MenuButton-content-exit-active {
+      top: 1rem;
       opacity: 0;
     }
-    &.ActionMenu-list-exit-done {
-      top: 0;
+    &.MenuButton-content-exit-done {
+      top: 1rem;
       opacity: 0;
     }
   }
@@ -55,7 +63,7 @@
     &:hover {
       background: #e2e0e6;
     }
-    &.ActionMenu-disabled {
+    &.MenuButton-disabled {
       color: #ccc;
       cursor: default;
       &:hover {

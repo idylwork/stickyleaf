@@ -1,4 +1,4 @@
-import React, { useReducer, createContext, useMemo, useContext, ReactElement, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useReducer } from 'react';
 
 interface MarkDownStates {
   origin: string;

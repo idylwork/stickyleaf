@@ -2,11 +2,20 @@ import { arrayToTable, escapeHtml, splitPresence } from '../modules';
 
 // マークダウンプレビュー
 export default new Map<RegExp, string | Function>([
+  /* サニタイズ */
+  [/[&'"<>]/g, (args: string[]) => {
+    switch (args[0]) {
+    case '&': return '&amp;';
+    case '\'': return '&#x27;';
+    case '"': return '&quot;';
+    case '<': return '&lt;';
+    case '>': return '&gt;';
+    }
+  }],
   /* コード */
   [/^```([a-z]*)\n*([^`]*\n)```$/gm, (args: string[]) => {
     // マーメイド記法
     if (args[1] === 'mermaid') {
-      console.log('🧜‍♀️MERMAID', args[2])
       return `<div class="mermaid">${args[2].replace(/\n/g, '\\n')}</div>`;
     }
     return `<div class="preview-md-code">${escapeHtml(args[2])}</div>`;
@@ -14,11 +23,11 @@ export default new Map<RegExp, string | Function>([
   /* インラインコード */
   [/`([^`]+)`/g, '<span class="preview-md-code">$1</span>'],
   /* 引用 */
-  [/(?:^> ?.*\n)+/gm, (args: string[]) => {
+  [/(?:^&gt; ?.*\n)+/gm, (args: string[]) => {
     let rows = splitPresence(args[0], '\n');
     let output = '<div class="preview-md-quote">';
     rows.forEach((row) => {
-      output += row.replace(/^> ?/, '') + '<br>';
+      output += row.replace(/^&gt; ?/, '') + '<br>';
     });
     output += '</div>';
     return output;
@@ -26,18 +35,32 @@ export default new Map<RegExp, string | Function>([
   /* 罫線 */
   [/^-{3,}$/gm, '<hr class="preview-md-hr">'],
   /* リスト */
-  [/^(?:[ 	]*- .*?\n)+/gm, (args: string[], options: { data: { checkboxIndex: number } }) => {
+  [/^[ 	]*- .*?\n(?:(?:[ 	]*- |[ 	]{2,}).*?\n)*/gm, (args: string[], options: { data: { checkboxIndex: number } }) => {
     let output = '<ul class="preview-md-list">';
     let rows = splitPresence(args[0], '\n');
+
+    /** @var リスト内改行時に使用する直前のインデント幅 */
+    let lastIndent = 0;
     rows.forEach((row) => {
+      const isNewLine = !/^[ 	]*- /.test(row);
+
+      // インデント幅を判定
       let indent = 0;
-      let text = row.replace(/^(  |	)*- /, (lineHead) => {
-        indent = lineHead.split(/  |	/).length-1;
-        return '';
-      });
+      let text = '';
+      if (!isNewLine) {
+        text = row.replace(/^(  |	)*- /, (lineHead) => {
+          indent = lineHead.split(/  |	/).length - 1;
+          return '';
+        })
+      } else {
+        text = row.replace(/^[ 	]+/, '');
+        indent = lastIndent;
+      }
+      lastIndent = indent;
 
       let className = 'preview-md-list-item';
       if (indent) className += ' preview-md-list-indent-' + indent;
+      if (isNewLine) className += ' preview-md-list-newline'
 
       // チェックボックス
       let isChecked: boolean | null = null; // null:リスト boolean:チェックボックス
@@ -51,8 +74,7 @@ export default new Map<RegExp, string | Function>([
         text = `<input type="checkbox" name="checkbox[${index}]" class="preview-md-checkbox" ${isChecked ? 'checked' : ''}>${innerText}`;
         className += ' preview-md-checklist';
       }
-
-      output += '<li class="' + className + '">' + text + '</li>';
+      output += `<li class="${className}">${text}</li>`;
     });
     output += '</ul>';
     return output;

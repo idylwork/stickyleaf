@@ -1,6 +1,6 @@
 {
-  "name": "persimmon",
-  "productName": "Persimmon",
+  "name": "stickyleaf",
+  "productName": "Stickyleaf",
   "description": "Markdown editor for works.",
   "version": "0.1.0",
   "license": "MIT",
@@ -8,14 +8,14 @@
   "scripts": {
     "dev": "run-p dev:*",
     "build": "cp -rf src/images/ dist/images && electron-packager . --overwrite --icon=./dist/images/icon.icns",
-    "deploy": "cp -rf Persimmon-darwin-x64/Persimmon.app /Applications",
+    "deploy": "npm run build; cp -rf Stickyleaf-darwin-x64/Stickyleaf.app /Applications",
     "predev": "rimraf dist",
     "dev:tsc": "tsc -w -p tsconfig.main.json",
     "dev:webpack": "cross-env NODE_ENV=\"development\" webpack --progress",
     "dev:electron": "wait-on ./dist/index.html && cross-env NODE_ENV=\"development\" electron ."
   },
   "build": {
-    "appId": "work.idyl.persimmon",
+    "appId": "work.idyl.stickyleaf",
     "files": [
       "dist/*",
       "src/*"
@@ -33,7 +33,6 @@
     }
   },
   "dependencies": {
-    "materialize-css": "^1.0.0",
     "mermaid": "^9.1.2",
     "nouislider": "^15.5.1",
     "react": "^17.0.2",

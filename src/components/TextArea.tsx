@@ -1,5 +1,6 @@
 import React from 'react';
 import { indentText } from '../libs/String';
+import { TEXT_MAX_LENGTH } from '../constants';
 
 type Props = {
   value: string;
@@ -47,6 +48,7 @@ export const TextArea: React.FC<Props> = ({ value, onChange }) => {
     <textarea
       className="Console-textarea"
       value={value}
+      maxLength={TEXT_MAX_LENGTH}
       autoCapitalize="off"
       onChange={handleChange}
       onKeyDown={handleKeyDown}

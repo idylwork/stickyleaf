@@ -1,76 +1,91 @@
-import React, { useState, useRef, useLayoutEffect, useMemo } from 'react';
-import './Console.scss';
-import { RuleType, convert } from '../rules/index';
-import { setClipboard } from '../modules';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
+import { BACKLOG_HEADING_RATE, NEW_TAB_PREFIX, SORT_DELIMITER, STORAGE_PREFIX } from '../constants';
 import useDelayEffect from '../hooks/useDelayEffect';
 import useMarkDown from '../hooks/useMarkDown';
-import { ActionMenu } from './ActionMenu';
-import { TextArea } from './TextArea';
 import { updatedPlaceholders } from '../libs/String';
+import { setClipboard } from '../modules';
+import { RuleType, convert } from '../rules/index';
+import { ActionMenu } from './ActionMenu';
+import './Console.scss';
 import { ConsoleTab } from './ConsoleTab';
+import { TextArea } from './TextArea';
+import { MenuButton } from './MenuButton';
+import { OpacityMenu } from './OpacityMenu';
 const { electronAPI } = window;
 
-/**
- * タブ名リスト
- */
-const TAB_NAME: string[] = [
-  'general',
-  'release',
-  'temp',
-];
+type Props = {
+  setOpacity: (opacity: number) => void;
+}
 
-const HEADING_RATE = [2, 4, 5];
-
-export const Console: React.FC = () => {
+export const Console = ({ setOpacity }: Props) => {
   /** マークダウン関連の状態管理 */
   const { origin, placeHolders, updateMarkDown } = useMarkDown();
-  /* 選択中のルール */
-  const [selectedRule, setSelectedRule] = useState<RuleType>(RuleType.None);
-  /* 選択中のタブ */
-  const [selectedTab, setSelectedTab] = useState<string>(TAB_NAME[0]);
-  /* テンプレート構文やプレースホルダを利用するか */
+  /** タブ名リスト */
+  const [tabs, setTabs] = useState<string[]>([]);
+  /** 選択中のタブ (初期化中はundefined) */
+  const [selectedTab, setSelectedTab] = useState<string | undefined>(undefined);
+  /** テンプレート構文やプレースホルダを利用するか */
   const [isTemplateEnable, setIsTemplateEnable] = useState<boolean>(false);
-  /* ステートを初期化済みか */
-  const isInitializedRef = useRef<boolean>(false);
-  /* タブ別のテキストリスト */
-  const originsRef = useRef<Map<string, string>>(new Map());
 
   /**
-   * 全タブの文章を更新してローカルストレージへ保存
+   * ローカルストレージから文章を読み込み
+   * @param tab
    */
-  const updateOrigins = () => {
-    const newOrigins = new Map(originsRef.current);
-    newOrigins.set(selectedTab, origin);
-    originsRef.current = newOrigins;
-    localStorage.setItem('origins', JSON.stringify([...newOrigins]));
+  const loadStorage = (tab: string) => {
+    updateOrigin(localStorage.getItem(`${STORAGE_PREFIX}${tab}`) ?? '');
+  };
+
+  /**
+   * ローカルストレージに文章を保存
+   * @param tab
+   * @param value - ファイル内容 (undefinedで削除)
+   */
+  const saveStorage = (tab: string, value: string | undefined) => {
+    if (value !== undefined) {
+      localStorage.setItem(`${STORAGE_PREFIX}${tab}`, value);
+    } else {
+      localStorage.removeItem(`${STORAGE_PREFIX}${tab}`);
+    }
+    localStorage.setItem('sort', tabs.join(SORT_DELIMITER))
   };
 
   // 初期化時にローカルストレージからステートを読み出す
   useLayoutEffect(() => {
-    try {
-      const newOrigins = new Map<string, string>(JSON.parse(localStorage.getItem('origins') ?? '[]'));
-      originsRef.current = newOrigins;
-      updateMarkDown({ origin: newOrigins.get(selectedTab) ?? '' })
-    } catch (error) {
-      console.error(error);
+    const data: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const storageKey = localStorage.key(i);
+      if (storageKey?.startsWith(STORAGE_PREFIX)) {
+        const dataKey = storageKey.substring(STORAGE_PREFIX.length);
+        data.push(dataKey);
+      }
     }
-    setTimeout(() => {
-      isInitializedRef.current = true;
-    }, 100);
+    if (!data.length) {
+      data.push(`${NEW_TAB_PREFIX}1`)
+    }
+
+    // 並べ替える
+    const sort = (localStorage.getItem('sort') ?? '').split(SORT_DELIMITER);
+    const newTabs = data.sort((a, b) => sort.indexOf(a) - sort.indexOf(a))
+
+    const initialTab = newTabs[0];
+    setSelectedTab(initialTab)
+    setTabs(newTabs);
+
+    loadStorage(initialTab);
   }, []);
 
   // 本文更新後に遅延してローカルストレージへ保存
   useDelayEffect(() => {
-    if (isInitializedRef.current) {
-      updateOrigins();
+    if (selectedTab) {
+      saveStorage(selectedTab, origin);
     }
   }, [origin]);
 
   /**
-   * 文章入力時
-   * @param newOrigin 新しい本文
+   * 本文更新時の動作
+   * @param newOrigin - 新しい本文
    */
-  const handleOriginChange = (newOrigin: string) => {
+  const updateOrigin = (newOrigin: string) => {
     if (isTemplateEnable) {
       // プレースホルダの検知
       updateMarkDown({ origin: newOrigin, placeHolders: updatedPlaceholders(placeHolders, newOrigin) })
@@ -81,17 +96,70 @@ export const Console: React.FC = () => {
 
   /**
    * タブ変更時
-   * @param event
+   * @param target - 次のタブ
    */
-  const handleTabChange = (tabName: string) => {
+  const selectTab = (target: string | undefined) => {
+    if (!selectedTab) return;
+
     // 変更前に内容をストレージ保存
-    updateOrigins();
+    saveStorage(selectedTab, origin);
 
-    setSelectedTab(tabName);
-    updateMarkDown({ origin: originsRef.current.get(tabName) ?? '' })
+    if (target) {
+      // タブの切り替え
+      loadStorage(target);
+      setSelectedTab(target);
+    } else {
+      // タブの追加
+      let maxTabNo = 0;
+      tabs.forEach((tab) => {
+        if (tab.startsWith(NEW_TAB_PREFIX)) {
+          const tabNo = (Number(tab.substring(NEW_TAB_PREFIX.length)) || 0);
+          if (tabNo > maxTabNo) {
+            maxTabNo = tabNo;
+          }
+        }
+      });
 
-    // アプリケーションタイトルの更新
-    electronAPI.setTitle(tabName);
+      const newTab = `${NEW_TAB_PREFIX}${maxTabNo + 1}`;
+      saveStorage(newTab, '');
+      setTabs([...tabs, newTab]);
+      setSelectedTab(newTab);
+    }
+  };
+
+  /**
+   * タブを名称変更する
+   * @param target
+   */
+  const renameTab = (target: string, name: string) => {
+    setTabs(tabs.map((tab) => tab === target ? name : tab));
+    saveStorage(name, origin);
+    saveStorage(target, undefined);
+    setSelectedTab(name);
+  };
+
+  /**
+   * タブを削除する
+   * @param target
+   */
+  const deleteTab = (target: string) => {
+    let targetIndex = 0;
+    const newTabs = tabs.filter((tab, index) => {
+      if (tab !== target) return true;
+
+      targetIndex = index;
+      return false;
+    });
+    if (!newTabs.length) {
+      newTabs.push(`${NEW_TAB_PREFIX}1`);
+    }
+
+    setTabs(newTabs);
+    saveStorage(target, undefined);
+
+    requestAnimationFrame(() => {
+      selectTab(newTabs[targetIndex] ?? newTabs[targetIndex - 1])
+    });
   };
 
   /**
@@ -105,9 +173,12 @@ export const Console: React.FC = () => {
     updateMarkDown({ placeHolders: newPlaceHolders });
   };
 
+  /**
+   * メニューのアクション定義
+   */
   const actions = useMemo(() => ({
     'Markdown書式でコピー': () => {
-      const options = { headingRate: HEADING_RATE, placeHolders };
+      const options = { headingRate: BACKLOG_HEADING_RATE, placeHolders };
       const text = convert(origin, RuleType.None, options);
       if (text) {
         setClipboard(text);
@@ -115,7 +186,7 @@ export const Console: React.FC = () => {
       }
     },
     'Backlog記法でコピー': () => {
-      const options = { headingRate: HEADING_RATE, placeHolders };
+      const options = { headingRate: BACKLOG_HEADING_RATE, placeHolders };
       const text = convert(origin, RuleType.Backlog, options);
       if (text) {
         setClipboard(text);
@@ -142,7 +213,7 @@ export const Console: React.FC = () => {
     'ファイルから復元する': async () => {
       const { ok, data } = await electronAPI.loadFile();
       if (ok && confirm('入力中の文章は上書きされます')) {
-        handleOriginChange(data ?? '');
+        updateOrigin(data ?? '');
       }
     },
   }), [origin, isTemplateEnable]);
@@ -150,21 +221,23 @@ export const Console: React.FC = () => {
   return (
     <section className="Console window-undraggable">
       <div className="Console-surface">
-        <ActionMenu actions={actions} />
+        <div className="Console-menu">
+          <OpacityMenu />
+          <ActionMenu actions={actions} />
+        </div>
         {isTemplateEnable && [...placeHolders].map(([placeName, value]) => (
           <label className="Console-placeholder" key={placeName}>
             <div className="Console-placeholder-label">{placeName}</div>
             <input
               type="text"
-              className="browser-default"
               value={value}
               data-place-name={placeName}
               onChange={handlePlaceholderChange}
             />
           </label>
         ))}
-        <TextArea value={origin} onChange={handleOriginChange} />
-        <ConsoleTab selection={selectedTab} items={TAB_NAME} onChange={handleTabChange} />
+        <TextArea value={origin} onChange={updateOrigin} />
+        {selectedTab && <ConsoleTab selection={selectedTab} tabs={tabs} onSelect={selectTab} onRename={renameTab} onDelete={deleteTab} />}
       </div>
     </section>
   );

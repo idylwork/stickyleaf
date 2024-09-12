@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { BrowserWindow, app, ipcMain, Notification, dialog } from 'electron';
+import { BrowserWindow, app, ipcMain, Notification, dialog, Menu } from 'electron';
 
 if (process.env.NODE_ENV === 'development') {
   const execPath =
@@ -12,6 +12,45 @@ if (process.env.NODE_ENV === 'development') {
     electron: path.resolve(__dirname, execPath),
   });
 }
+
+const menu = Menu.buildFromTemplate([
+  {
+    label: app.name,
+    submenu: [
+      { role: 'reload' },
+      { role: 'forceReload' },
+      { role: 'hide' },
+      { type: 'separator' },
+      { role: 'quit' },
+    ]
+  },
+  {
+    label: 'Edit',
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      { role: 'delete' },
+      { role: 'selectAll' },
+    ]
+  },
+  {
+    label: 'Action',
+    submenu: [
+      {
+        label: 'Clear Local Storage',
+        async click(item, focusedWindow) {
+          await focusedWindow?.webContents.executeJavaScript('localStorage.clear()', true)
+          focusedWindow?.reload();
+        },
+      },
+    ]
+  },
+]);
+Menu.setApplicationMenu(menu);
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -28,8 +67,8 @@ const createWindow = () => {
     mainWindow.webContents.openDevTools();
   }
 
-  ipcMain.on('update-title', (_e, title) => {
-    mainWindow.setTitle(`Persimmon − ${title}`);
+  ipcMain.on('update-opacity', (_e, opacity) => {
+    mainWindow.setOpacity(opacity);
   });
 
   ipcMain.on('notify', (_e, message) => {

@@ -13,7 +13,7 @@ export const Preview: React.FC = () => {
 
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.querySelectorAll('.mermaid').forEach((mermaidEl) => mermaid.init(mermaidEl));
+      contentRef.current.querySelectorAll('.mermaid').forEach((mermaidEl) => mermaid.init(undefined, mermaidEl as HTMLElement));
     }
   })
 
