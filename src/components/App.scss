@@ -1,0 +1,51 @@
+@charset 'UTF-8';
+
+@import "../settings.scss";
+@import "../reset.css";
+
+/* Global Style */
+body {
+  font-size: 10px;
+  background: #ffffff;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+// ウィンドウ移動用のハンドル
+body,
+.window-undraggable {
+  -webkit-app-region: no-drag;
+}
+.window-draggable {
+  -webkit-app-region: drag;
+}
+
+// ラジオボタンの色変更
+[type="radio"]:checked + span:after {
+  border-color: slategray !important;
+  background-color: slategray !important;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.App {
+  background-attachment: fixed;
+  opacity: 0;
+  animation: fade-in 0.5s forwards;
+
+  .App-texture {
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    background: url("../images/texture.jpg");
+    background-size: cover;
+    background-attachment: fixed;
+    opacity: 0.4;
+    opacity: 0;
+    pointer-events: none;
+  }
+}

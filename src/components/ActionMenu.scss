@@ -1,0 +1,67 @@
+@charset 'UTF-8';
+
+@import "../settings.scss";
+
+.ActionMenu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.25rem;
+
+  &-button {
+    width: 100%;
+  }
+
+  &-list {
+    position: absolute;
+    background: white;
+    border-radius: 4px;
+    width: 100%;
+    overflow: hidden;
+    opacity: 0.9;
+
+    // 開閉アニメーション
+    transition: top 0.1s, opacity 0.1s;
+    &.ActionMenu-list-enter {
+      top: 1.3rem;
+      opacity: 0;
+      pointer-events: none;
+    }
+    &.ActionMenu-list-enter-active {
+      top: 1.5rem;
+      opacity: 1;
+    }
+    &.ActionMenu-list-enter-done {
+      top: 1.5rem;
+      opacity: 1;
+    }
+    &.ActionMenu-list-exit {
+      top: 1.5rem;
+      opacity: 1;
+    }
+    &.ActionMenu-list-exit-active {
+      top: 1.3rem;
+      opacity: 0;
+    }
+    &.ActionMenu-list-exit-done {
+      top: 1.3rem;
+      opacity: 0;
+    }
+  }
+
+  &-item {
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+
+    &:hover {
+      background: #e2e0e6;
+    }
+    &.ActionMenu-disabled {
+      color: #ccc;
+      cursor: default;
+      &:hover {
+        background: none;
+      }
+    }
+  }
+}

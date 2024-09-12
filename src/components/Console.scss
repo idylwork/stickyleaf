@@ -1,0 +1,96 @@
+@charset 'UTF-8';
+
+@import "../settings.scss";
+
+.Console {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 40vw;
+  padding: 10px;
+  box-sizing: border-box;
+
+  @include media-s() {
+    width: 100vw;
+    height: $height-dew;
+    top: unset;
+    bottom: 0;
+    padding: 7px;
+  }
+
+  .Console-surface {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 10px 12px 10px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+
+    @include media-s() {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 12px 6px;
+    }
+
+    .Console-placeholder {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+      .Console-placeholder-label {
+        color: #333333;
+        font-weight: 100;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      input {
+        width: 80%;
+        min-width: 100px;
+        margin-left: 10px;
+        border: 0.99px solid #333333;
+        background: transparent;
+      }
+    }
+
+    // MaterializeCSSのボタン上書き
+    .btn {
+      flex-shrink: 0;
+      margin: 4px 0;
+
+      +button,
+      div {
+        margin-top: 0;
+      }
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    .btn-small {
+      font-size: 0.6rem;
+    }
+
+    .btn-extra-small {
+      font-size: 0.4rem;
+      font-weight: 500;
+      height: 22px;
+      line-height: 22px;
+    }
+  }
+
+  // 見出しレベルのバー
+  .Console-input-heading-rate {
+    margin: 6px 0 38px;
+  }
+
+  // 文章編集部
+  .Console-textarea {
+    height: 100%;
+    border: none;
+    resize: none;
+    box-shadow: inset 0 1px 1px 0 rgb(0 0 0 / 7%), inset 0 1.5px 0.5px -1px rgb(0 0 0 / 6%), inset 0 0.5px 2.5px 0 rgb(0 0 0 / 10%);
+  }
+}
