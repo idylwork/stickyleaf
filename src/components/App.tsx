@@ -1,24 +1,22 @@
 import React, { useMemo } from 'react';
 import './App.scss';
 
-import { Preview } from './Preview';
-import { Console } from './Console';
-import { randomNumber } from '../modules';
+import { useAtomValue } from 'jotai';
+import { themeAtom } from '../atoms';
 import { MarkDownProvider } from '../hooks/useMarkDown';
+import { Console } from './Console';
+import { Preview } from './Preview';
 
 export const App = () => {
+  const theme = useAtomValue(themeAtom)
   /** ランダムな背景色 */
-  const backgroundImage = useMemo<string>(() => {
-    const colorBgStart = `hsl(${randomNumber(360)}, ${randomNumber(90, 100)}%, ${randomNumber(90, 100)}%)`;
-    const colorBgEnd = `hsl(${randomNumber(360)}, ${randomNumber(80, 100)}%, ${randomNumber(30, 80)}%)`;
-    return `linear-gradient(${colorBgStart}, ${colorBgEnd} ${randomNumber(50, 200)}%)`;
-  }, []);
+  const background = useMemo(() => `linear-gradient(${theme.topColor}, ${theme.bottomColor} ${theme.gradientPercentage}%)`, [theme]);
   /** テクスチャ画像の透明度 */
-  const textureOpacity: number = useMemo(() => randomNumber(1, 4) * 0.1, []);
+  const textureOpacity: number = useMemo(() => theme.textureRatio, [theme]);
 
   return (
     <MarkDownProvider>
-      <main className="App window-draggable" style={{ backgroundImage: backgroundImage }}>
+      <main className="App window-draggable" style={{ backgroundImage: background }}>
         <div className="App-texture" style={{ opacity: textureOpacity }} />
         <Preview />
         <Console />

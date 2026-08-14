@@ -120,10 +120,48 @@ export const updatedPlaceholders = (placeHolders: Map<string, string> | null = n
       newPlaceHolders.set(placeName, '');
     }
   };
-  newValue.replace(/{{ ?([a-zA-Z_-]+) ?}}/g, (substring: string, placeName: string): string => {
+  newValue.replace(/{{ ?#?([a-zA-Z_-]+) ?}}/g, (substring: string, placeName: string): string => {
     appendPlaceHolder(placeName);
     return '';
   });
 
   return newPlaceHolders;
+};
+
+/**
+ * Mustache構文を置換する
+ * @param output 置換対象の文字列
+ * @param placeHolders プレースホルダの置換値マップ (プレースホルダ名: 値)
+ * @returns 置換された文字列
+ */
+export const replaceMustache = (output: string, placeHolders: Map<string, string>) => {
+  placeHolders.forEach((value, placeHolder) => {
+    // {{ #item }} {{ /item }} 空でないときのみ表示し、コンマ区切りの場合は繰り返す (内部のテンプレート展開を項目のみにする)
+    // {{ ^item }} {{ /item }} 空のときのみ表示する
+    const sectionRegExp = new RegExp(`{{ ?([#^])${placeHolder} ?}}\\n?([\\s\\S]+?\\n?)?{{ ?/${placeHolder} ?}}\\n?`, 'g');
+    output = output.replace(sectionRegExp, (_all: string, operator: string, section: string) => {
+      switch (operator) {
+        case '#':
+          // 空でなければ展開
+          if (value === '') return '';
+          const items = value.split(/, ?/);
+          if (items.length <= 1) return section;
+
+          // 区切り文字がある場合はループして展開
+          return items.map((chunk) => {
+            const newPlaceHolders = new Map(placeHolders);
+            newPlaceHolders.set(placeHolder, chunk);
+            return replaceMustache(section, newPlaceHolders);
+          }).join('');
+        case '^':
+          return value === '' && section ? section : '';
+        default: return '';
+      }
+    });
+
+    // {{ item }} プレースホルダの置換
+    const regExp = new RegExp(`{{ ?${placeHolder} ?}}`, 'g');
+    output = output.replace(regExp, value);
+  });
+  return output;
 };

@@ -9,7 +9,7 @@
   box-sizing: border-box;
 
   @include media-s() {
-    width: 100vw;
+    width: 100%;
     padding: 30px 10px $height-dew 5px;
   }
 
@@ -99,7 +99,7 @@
     background: rgba(240, 240, 240, 0.8);
     border: 0.99px solid #797d7d;
     border-radius: 5px;
-    overflow: scroll;
+    overflow-y: scroll;
     text-align: center;
     padding-top: 0.5rem;
     box-shadow: inset 1px 3px 5px rgba(10, 10, 10, 0.2);
