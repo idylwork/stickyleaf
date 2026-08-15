@@ -16,7 +16,7 @@ export interface Theme {
 export const themeAtom = atom<Theme>({
     opacity: 0.9,
     topColor: `hsl(${randomNumber(360)}, ${randomNumber(90, 100)}%, ${randomNumber(90, 100)}%)`,
-    bottomColor: `hsl(${randomNumber(360)}, ${randomNumber(80, 100)}%, ${randomNumber(30, 80)}%)`,
+    bottomColor: `hsl(${randomNumber(360)}, ${randomNumber(80, 100)}%, ${randomNumber(50, 80)}%)`,
     gradientPercentage: randomNumber(50, 200),
     textureRatio: randomNumber(1, 4) * 0.1,
   });

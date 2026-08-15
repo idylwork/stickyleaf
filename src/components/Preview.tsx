@@ -13,7 +13,7 @@ export const Preview: React.FC = () => {
 
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.querySelectorAll('.mermaid').forEach((mermaidEl) => mermaid.init(undefined, mermaidEl as HTMLElement));
+      contentRef.current.querySelectorAll('.mermaid').forEach((mermaidEl) => { void mermaid.run({ nodes: [mermaidEl as HTMLElement] }); });
     }
   })
 
@@ -51,7 +51,7 @@ export const Preview: React.FC = () => {
   }, [origin, placeHolders]);
 
   return (
-    <section className="Preview window-draggable">
+    <section className="Preview window-draggable" data-tauri-drag-region>
       <div
         ref={contentRef}
         onClick={handleClick}

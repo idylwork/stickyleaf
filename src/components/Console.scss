@@ -1,6 +1,6 @@
 @charset 'UTF-8';
 
-@import "../settings.scss";
+@use "../settings.scss" as *;
 
 .Console {
   position: fixed;
@@ -19,6 +19,10 @@
     top: unset;
     bottom: 0;
     padding: 0.3rem;
+
+    .is-inactive & {
+      display: none;
+    }
   }
 
   .Console-surface {

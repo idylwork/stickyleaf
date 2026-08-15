@@ -4,6 +4,7 @@ import './ThemeMenu.scss';
 import { useAtom } from 'jotai';
 import { Theme, themeAtom, themesAtom } from '../atoms';
 import { THEME_MAX_COUNT } from '../constants';
+import { setOpacity } from '../libs/tauri';
 
 /**
  * テーマに関するメニュー
@@ -32,7 +33,7 @@ export const ThemeMenu: React.FC = () => {
   const handleOpacityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newOpacity = Number(event.currentTarget.value);
     setTheme({ ...theme, opacity: newOpacity });
-    window.electronAPI.setOpacity(newOpacity);
+    setOpacity(newOpacity);
   };
 
   /**

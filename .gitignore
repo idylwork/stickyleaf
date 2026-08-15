@@ -1,9 +1,10 @@
 dist
 node_modules
-release
 npm-*.log
 pnpm-*.log
-yarn-*.log
 .env
 .DS_Store
-*-darwin-x64
+src-tauri/target
+src-tauri/gen/schemas
+dist-ssr
+*.local

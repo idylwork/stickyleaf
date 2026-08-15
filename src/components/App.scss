@@ -1,6 +1,6 @@
 @charset 'UTF-8';
 
-@import "../settings.scss";
+@use "../settings.scss" as *;
 @import "../reset.css";
 
 /* Global Style */

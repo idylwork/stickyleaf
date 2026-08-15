@@ -5,6 +5,7 @@ import { BACKLOG_HEADING_RATE, NEW_TAB_PREFIX, STORAGE_DELIMITER, STORAGE_PREFIX
 import useDelayEffect from '../hooks/useDelayEffect';
 import useMarkDown from '../hooks/useMarkDown';
 import { updatedPlaceholders } from '../libs/String';
+import { loadFile, notify, saveFile } from '../libs/tauri';
 import { setClipboard } from '../modules';
 import { RuleType, convert } from '../rules/index';
 import { ActionMenu } from './ActionMenu';
@@ -12,7 +13,6 @@ import './Console.scss';
 import { ConsoleTab } from './ConsoleTab';
 import { TextArea } from './TextArea';
 import { ThemeMenu } from './ThemeMenu';
-const { electronAPI } = window;
 
 export const Console = () => {
   /** マークダウン関連の状態管理 */
@@ -228,7 +228,7 @@ const ConsoleActionMenu = () => {
       const text = convert(origin, RuleType.None, options);
       if (text) {
         setClipboard(text);
-        electronAPI.notify(`コピーしました (${text.replace(/\s+/g, ' ').replace(/\s+$/g, '')})`);
+        notify(`コピーしました (${text.replace(/\s+/g, ' ').replace(/\s+$/g, '')})`);
       }
     },
     'Backlog記法でコピー': () => {
@@ -236,7 +236,7 @@ const ConsoleActionMenu = () => {
       const text = convert(origin, RuleType.Backlog, options);
       if (text) {
         setClipboard(text);
-        electronAPI.notify(`コピーしました (${text.replace(/\s+/g, ' ').replace(/\s+$/g, '')})`);
+        notify(`コピーしました (${text.replace(/\s+/g, ' ').replace(/\s+$/g, '')})`);
       }
     },
     'Backlog記法から変換': null,
@@ -247,16 +247,16 @@ const ConsoleActionMenu = () => {
     '重複行検索': () => {
       let duplicated = origin.split('\n').filter((row, i, self) => row !== '' && self.indexOf(row) === i && i !== self.lastIndexOf(row));
       if (duplicated.length) {
-        electronAPI.notify(`重複する行がありました\n${duplicated.join('\n')}`);
+        notify(`重複する行がありました\n${duplicated.join('\n')}`);
       } else {
-        electronAPI.notify('重複する行はありません');
+        notify('重複する行はありません');
       }
     },
     'ファイルに保存': () => {
-      electronAPI.saveFile(origin);
+      saveFile(origin);
     },
     'ファイルから復元する': async () => {
-      const { ok, data } = await electronAPI.loadFile();
+      const { ok, data } = await loadFile();
       if (ok && confirm('入力中の文章は上書きされます')) {
         updateOrigin(data ?? '');
       }

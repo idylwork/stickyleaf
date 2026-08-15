@@ -1,4 +1,5 @@
-@import "../settings.scss";
+@use "sass:math";
+@use "../settings.scss" as *;
 
 .Preview {
   width: 60vw;
@@ -11,13 +12,17 @@
   @include media-s() {
     width: 100%;
     padding: 30px 10px $height-dew 5px;
+
+    .is-inactive & {
+      padding-bottom: 30px;
+    }
   }
 
   @for $i from 1 through 6 {
     .preview-md-heading-#{$i} {
-      font-size: #{1 / $i + 0.8}rem;
+      font-size: #{math.div(1, $i) + 0.8}rem;
       font-weight: 900;
-      margin: #{1.2 / $i}rem 0 #{0.2 / $i}rem;
+      margin: #{math.div(1.2, $i)}rem 0 #{math.div(0.2, $i)}rem;
       @if $i <= 2 {
         padding: 0 #{(4 - $i) * 3}px 4px;
         border-bottom: 1px solid $color-dark;
@@ -89,7 +94,7 @@
 
   @for $i from 1 through 6 {
     .preview-md-heading-#{$i} {
-      font-size: #{1 / $i + 0.5}rem;
+      font-size: #{math.div(1, $i) + 0.5}rem;
       font-weight: 900;
     }
   }

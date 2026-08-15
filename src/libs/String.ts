@@ -165,3 +165,17 @@ export const replaceMustache = (output: string, placeHolders: Map<string, string
   });
   return output;
 };
+
+/**
+ * クラス名の配列を結合して文字列を返す
+ * @param classes クラス名の配列
+ * @returns クラス名の文字列
+ */
+export const classList = (...classes: Array<string | false | null | undefined>) => {
+  let classNames = '';
+  for (let i = 0; i < classes.length; i++) {
+    const className = classes[i];
+    if (className) classNames += classNames ? ' ' + className : className;
+  }
+  return classNames;
+};
